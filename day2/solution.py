@@ -21,9 +21,39 @@ def get_peek_value(peek: str) -> tuple[str, int]:
     peek_value = (clean_line(peek_split[1]), int(clean_line(peek_split[0])))
     
     return peek_value
+
+
+def get_power(amounts: dict[str, int]):
+    power = 1
+    for amount in amounts.values():
+        power *= amount
     
+    return power
+
+def get_min_values(peeks: list[str]) -> dict[str, int]:
+    score = {"red": 0, "blue": 0, "green": 0}
+    
+    for peek in peeks:
+        for cube_score in peek.split(","):
+            score_value = get_peek_value(clean_line(cube_score))
+            if score_value[1] > score[score_value[0]]:
+                score[score_value[0]] = score_value[1]
+                
+    return score
+        
 
 def solve() -> int:
+    score = 0
+    
+    with open("day2/input.txt", "r") as input_file:
+        for line in input_file.readlines():
+            min_values = get_min_values(get_peeks(clean_line(line)))
+            score += get_power(min_values)
+            
+    return score
+    
+
+def solve1() -> int:
     total = 0
     
     '''
