@@ -1,4 +1,5 @@
 from shared.helpers import clean_line
+from shared.helpers import is_number
 
 def get_line_numbers(line: str) -> list[tuple[int, int]]:
     # takes a line and returns a list of start and end indecies(inclusive first, exclusive last) of the numbers
@@ -112,13 +113,117 @@ def is_part_number(lines: list[str], number: list[int], line_number: int):
             return int(current_line[number[0]:number[1]])
     
     return None
+
+            
     
+    #if current_line
+
+
+def get_number_from_hit(line: str, hit_loc: int) -> int:
+    number = [0, 0]
     
+    curr_index = hit_loc
     
+    while True:
+        # check right
+        if curr_index >= len(line):
+            number[1] = None
+            break
+        
+        if not is_number(line[curr_index]):
+            number[1] = curr_index
+            break
+        
+        curr_index += 1
+        
+    
+    curr_index = hit_loc - 1
+    
+    while True:
+        if curr_index < 0:
+            number[0] = 0
+            break
+        
+        if not is_number(line[curr_index]):
+            number[0] = curr_index + 1
+            break
+        
+        curr_index -= 1
+    
+    if number[1] is None:
+        return int(line[number[0]:])
+    return int(line[number[0]:number[1]])
+        
+
+     
+def is_a_gear(lines: list[str], gear: list[int, int]):
+    numbers = []
+    
+    current_line = lines[gear[0]]
+    previous_line = lines[gear[0] - 1] if gear[0] - 1 >= 0 else None
+    next_line = lines[gear[0] + 1] if gear[0] + 1 < len(lines) else None
+    
+    left_stop = gear[1] - 1 if gear[1] - 1 >= 0 else 0
+    right_stop = gear[1] + 2 if gear[1] + 2 < len(current_line) else len(current_line)
     
     
 
+    
+
+    if previous_line is not None:
+        print(previous_line[left_stop:right_stop])
+        for i in range(left_stop, right_stop):
+            if is_number(previous_line[i]):
+                hit_number = get_number_from_hit(previous_line, i)
+                if hit_number not in numbers:
+                    numbers.append(hit_number)
+
+    print(current_line[left_stop:right_stop])
+    for i in range(left_stop, right_stop):
+        if is_number(current_line[i]):
+            hit_number = get_number_from_hit(current_line, i)
+            print(hit_number)
+            if hit_number not in numbers:
+                numbers.append(hit_number)
+    
+    if next_line is not None:
+        print(next_line[left_stop:right_stop])
+        for i in range(left_stop, right_stop):
+            if is_number(next_line[i]):
+                hit_number = get_number_from_hit(next_line, i)
+                print(hit_number)
+                if hit_number not in numbers:
+                    numbers.append(hit_number)
+    
+    if len(numbers) > 1:
+        return numbers
+    return None
+    
+            
+            
+                    
 def solve():
+    total = 0
+    
+    lines = []
+    
+    with open("day3/input.txt", "r") as input_file:
+        for line in input_file.readlines():
+            #line_numbers.append(get_line_numbers(clean_line(line)))
+            lines.append(clean_line(line))
+    
+    for i, line in enumerate(lines):
+        for j, digit in enumerate(line):
+            if digit == "*":
+                is_gear = is_a_gear(lines, [i, j])
+                if is_gear is not None:
+                    print(is_gear)
+                    total += is_gear[0] * is_gear[1]
+    
+    return total
+    
+
+def solve1():
     total = 0
     
     lines = []
